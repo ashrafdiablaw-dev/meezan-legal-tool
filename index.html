@@ -1,0 +1,267 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>ميزان — محرر المستندات القانونية</title>
+<style>
+:root{--bg:#f4f6f5;--card:#fff;--ink:#1b2321;--mute:#5d6b67;--line:#d9e0dd;--pri:#17403a;--onpri:#fff;--acc:#9a7a2e;--hl:#e3efe9;--bad:#9b2c2c}
+@media(prefers-color-scheme:dark){:root{--bg:#121816;--card:#1a2220;--ink:#e6ece9;--mute:#9fb0aa;--line:#2c3935;--pri:#5fb3a0;--onpri:#0e1513;--acc:#d2ad5a;--hl:#22332f;--bad:#e08a8a}}
+*{box-sizing:border-box}[hidden]{display:none!important}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.7 "Segoe UI",Tahoma,"Noto Naskh Arabic",system-ui,sans-serif}
+header{background:var(--pri);color:var(--onpri);padding:12px 16px;display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+h1{font-size:1.4rem;margin:0;flex:1 1 220px}h1 small{font-size:.85rem;font-weight:400;opacity:.85;margin-inline-start:8px}
+.greet{background:var(--card);color:var(--pri);border-bottom:1px solid var(--line);padding:8px 16px;text-align:center;display:flex;flex-direction:column;line-height:1.5}
+.greet span{color:var(--acc);font-size:.92rem}
+h2{font-size:1rem;margin:0 0 8px}
+button,.btn,select,input,textarea{font:inherit;color:inherit}
+button,.btn{background:var(--card);color:var(--pri);border:1px solid var(--line);border-radius:8px;padding:6px 12px;cursor:pointer;display:inline-block}
+header button,header .btn{border:0}
+button.p{background:var(--pri);color:var(--onpri);border-color:var(--pri)}
+button:disabled{opacity:.5;cursor:default}
+:focus-visible{outline:2px solid var(--acc);outline-offset:2px}
+input,select,textarea{background:var(--card);border:1px solid var(--line);border-radius:8px;padding:6px 10px;width:100%}
+textarea{resize:vertical}
+main{display:grid;grid-template-columns:1.1fr 1fr;gap:14px;padding:14px;max-width:1200px;margin:auto}
+@media(max-width:860px){main{grid-template-columns:1fr}}
+.card{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:12px;min-width:0}
+#st{margin:0;padding:8px 16px;font-size:.92rem;color:var(--mute)}#st.bad{color:var(--bad)}
+#pv{max-height:70vh;overflow:auto;padding:4px}
+.pp{padding:4px 8px;border-radius:6px;text-align:justify}.pp b{color:var(--mute);font-weight:400;font-size:.8rem}
+.pp.ch{background:var(--hl)}
+.tabs{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px}
+.tabs button[aria-selected=true]{background:var(--pri);color:var(--onpri)}
+.row{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:8px 0}.row>*{flex:1 1 120px}
+.row.f>*{flex:0 0 auto}
+.note{color:var(--mute);font-size:.88rem;margin:6px 0}
+#log{max-height:34vh;overflow:auto;display:flex;flex-direction:column;gap:6px;margin-bottom:8px}
+.m{padding:6px 10px;border-radius:8px;white-space:pre-wrap}.m.u{background:var(--hl)}.m.a{border:1px solid var(--line)}.m.bad{color:var(--bad)}
+.it{border:1px solid var(--line);border-radius:8px;padding:6px 8px;margin:6px 0;font-size:.92rem}
+.it del{color:var(--bad)}.it .t{color:var(--mute);font-size:.8rem}
+.chips button{font-size:.85rem;padding:3px 10px}
+</style>
+</head>
+<body>
+<div class="greet"><strong>مع تحيات مكتب دياب للاستشارات القانونية</strong><span>أ. أشرف دياب</span></div>
+<header>
+<h1>ميزان <small>محرر المستندات القانونية</small></h1>
+<label class="btn">فتح ملف Word<input id="file" type="file" accept=".docx" hidden></label>
+<button id="dl" disabled>حفظ / تصدير Word</button>
+<button id="wa" disabled>مشاركة على واتساب</button>
+<button id="undo" disabled>تراجع</button>
+<button id="dir">اختيار مجلد الحفظ</button>
+</header>
+<p id="st">افتح ملف ‎.docx‎ أو أنشئ مستنداً جديداً من تبويب القوالب.</p>
+<main>
+<section class="card"><h2>المستند</h2><div id="pv"></div><button id="more" hidden>عرض المزيد</button></section>
+<section class="card">
+<div class="tabs" role="tablist">
+<button data-t="chat" aria-selected="true">الشات</button><button data-t="fmt" aria-selected="false">التنسيق</button><button data-t="tpl" aria-selected="false">القوالب</button><button data-t="lib" aria-selected="false">المكتبة</button><button data-t="set" aria-selected="false">الإعدادات</button>
+</div>
+
+<div class="tab" id="t-chat">
+<div id="log"></div>
+<div class="row f chips"><button data-q="راجع الاستشهادات القانونية في المذكرة على نصوص المكتبة وصحّح ما يلزم">مراجعة الاستشهادات</button><button data-q="اقترح فقرة ختامية وطلبات مناسبة في نهاية المذكرة">فقرة ختامية</button><button data-q="لخّص المذكرة في فقرة واحدة">تلخيص</button></div>
+<textarea id="q" rows="3" placeholder="مثال: ادعم الفقرة 5 بنص المادة 163 من القانون المدني"></textarea>
+<div class="row f"><button class="p" id="send">إرسال</button><button id="spell">تدقيق إملائي ولغوي</button><label><input id="useLib" type="checkbox" checked style="width:auto"> الاستعانة بالمكتبة</label></div>
+<div id="pend"></div>
+<p class="note">راجع أي نص قانوني مُدرج مع المصدر الرسمي قبل الاعتماد.</p>
+</div>
+
+<div class="tab" id="t-fmt" hidden>
+<div class="row"><label>الخط<select id="font"></select></label><label>الحجم<input id="size" type="number" min="8" max="40" value="16"></label><label>تباعد الأسطر<input id="ls" type="number" min="1" max="3" step="0.1" value="1.5"></label></div>
+<label><input id="just" type="checkbox" checked style="width:auto"> ضبط الفقرات (توزيع)</label>
+<div class="row f"><button class="p" id="fmtb">تطبيق على كامل المستند</button></div>
+<p class="note">تُضبط الفقرات يمين‑إلى‑يسار ويبقى حجم العناوين كما هو. الخطوط تظهر في Word إذا كانت مثبتة على الجهاز.</p>
+</div>
+
+<div class="tab" id="t-tpl" hidden>
+<div class="row"><label>مكان الإدراج<select id="pos"><option value="end">نهاية المستند</option><option value="start">بداية المستند</option></select></label></div>
+<div id="tpls"></div>
+<div class="row"><input id="tname" placeholder="اسم القالب الجديد"><button id="tsave">حفظ المستند الحالي كقالب</button></div>
+<p class="note">القوالب المحفوظة تبقى على هذا الجهاز. ضع علامة ‎#‎ أول السطر لجعله عنواناً.</p>
+</div>
+
+<div class="tab" id="t-lib" hidden>
+<input id="ls1" placeholder="ابحث في المكتبة: كلمة أو رقم مادة">
+<div id="res"></div>
+<h2 style="margin-top:14px">إضافة نص إلى مكتبتك</h2>
+<div class="row"><input id="lt" placeholder="العنوان، مثل: الدستور المصري"><select id="lk"><option>دستور</option><option>قانون</option><option>لائحة</option><option>حكم</option><option>مرجع</option></select></div>
+<textarea id="lx" rows="4" placeholder="ألصق النص الرسمي هنا"></textarea>
+<div class="row"><input id="lf" type="file" accept=".txt,.docx"><button id="ladd" class="p">إضافة</button></div>
+<div id="loc"></div>
+<p class="note">ما تضيفه هنا يُحفظ على جهازك. لمشاركته مع كل المستخدمين ضع الملف في مجلد library بالمستودع (انظر README).</p>
+</div>
+
+<div class="tab" id="t-set" hidden>
+<label>مفتاح Anthropic API<input id="key" type="password" autocomplete="off"></label>
+<label>النموذج<input id="mdl" placeholder="claude-sonnet-4-6"></label>
+<div class="row f"><button class="p" id="sset">حفظ</button><button id="cset">مسح المفتاح</button></div>
+<p class="note">يُحفظ المفتاح في متصفحك فقط ويُرسل مباشرة إلى Anthropic. لا تدخله على جهاز لا تثق به.</p>
+<p class="note">تنبيه سرية: عند استخدام الشات أو التدقيق تُرسل فقرات المستند إلى Anthropic عبر مفتاحك. لا ترسل بيانات موكلين حساسة قبل التأكد من سياسة مكتبك.</p>
+</div>
+</section>
+</main>
+
+<script>
+const W="http://schemas.openxmlformats.org/wordprocessingml/2006/main",XS="http://www.w3.org/XML/1998/namespace";
+const PO="pStyle keepNext keepLines pageBreakBefore framePr widowControl numPr suppressLineNumbers pBdr shd tabs suppressAutoHyphens kinsoku wordWrap overflowPunct topLinePunct autoSpaceDE autoSpaceDN bidi adjustRightInd snapToGrid spacing ind contextualSpacing mirrorIndents suppressOverlap jc textDirection textAlignment textboxTightWrap outlineLvl divId cnfStyle rPr sectPr pPrChange".split(" ");
+const RO="rStyle rFonts b bCs i iCs caps smallCaps strike dstrike outline shadow emboss imprint noProof snapToGrid vanish webHidden color spacing w kern position sz szCs highlight u effect bdr shd fitText vertAlign rtl cs em lang eastAsianLayout specVanish oMath".split(" ");
+let zip,doc,paras=[],pending=[],changed=new Set(),fname="مستند.docx",shown=120,dir=null,lib=null,hist=[];
+const $=i=>document.getElementById(i),ls=localStorage;
+const kids=(e,n)=>[...e.children].filter(c=>c.localName===n);
+const ptext=p=>[...p.getElementsByTagNameNS(W,"t")].map(t=>t.textContent).join("");
+const runs=()=>[...doc.getElementsByTagNameNS(W,"r")].filter(r=>kids(r,"t").length);
+const rtext=r=>kids(r,"t").map(t=>t.textContent).join("");
+const st=(m,bad)=>{$("st").textContent=m;$("st").className=bad?"bad":""};
+const jget=(k)=>{try{return JSON.parse(ls.getItem(k)||"[]")}catch(e){return[]}};
+const loadZip=()=>window.JSZip?Promise.resolve():new Promise((ok,no)=>{const s=document.createElement("script");s.src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js";s.onload=ok;s.onerror=no;document.head.appendChild(s)});
+
+/* ---------- XML helpers ---------- */
+function setC(parent,name,attrs,order){kids(parent,name).forEach(c=>c.remove());const el=doc.createElementNS(W,"w:"+name);for(const k in attrs)el.setAttributeNS(W,"w:"+k,attrs[k]);const i=order.indexOf(name);parent.insertBefore(el,[...parent.children].find(c=>order.indexOf(c.localName)>i)||null);return el}
+const getC=(parent,name,order)=>kids(parent,name)[0]||setC(parent,name,{},order);
+function props(el,name){let x=kids(el,name)[0];if(!x){x=doc.createElementNS(W,"w:"+name);el.insertBefore(x,el.firstChild)}return x}
+function setRun(r,text){const ts=kids(r,"t");ts.slice(1).forEach(t=>t.remove());ts[0].setAttributeNS(XS,"xml:space","preserve");ts[0].textContent=text}
+function setText(p,text){const rs=runs().filter(r=>r.parentNode===p||p.contains(r));let r=rs[0];if(!r){r=doc.createElementNS(W,"w:r");p.appendChild(r);const t=doc.createElementNS(W,"w:t");r.appendChild(t);rs.push(r)}rs.slice(1).forEach(x=>kids(x,"t").forEach(t=>t.remove()));setRun(r,text)}
+function newPara(ref,text){const p=doc.createElementNS(W,"w:p"),pp=kids(ref,"pPr")[0];if(pp){const c=pp.cloneNode(true);kids(c,"numPr").concat(kids(c,"sectPr")).forEach(n=>n.remove());p.appendChild(c)}
+const r0=runs().find(r=>ref.contains(r)),r=doc.createElementNS(W,"w:r"),rp=r0&&kids(r0,"rPr")[0];if(rp)r.appendChild(rp.cloneNode(true));
+const t=doc.createElementNS(W,"w:t");t.setAttributeNS(XS,"xml:space","preserve");t.textContent=text;r.appendChild(t);p.appendChild(r);return p}
+function fnt(rp,txt,hd){const f=$("font").value,sz=Math.round($("size").value*2);const fo=getC(rp,"rFonts",RO);["ascii","hAnsi","cs","eastAsia"].forEach(a=>fo.setAttributeNS(W,"w:"+a,f));["asciiTheme","hAnsiTheme","cstheme","eastAsiaTheme"].forEach(a=>fo.removeAttributeNS(W,a));
+if(!hd){setC(rp,"sz",{val:sz},RO);setC(rp,"szCs",{val:sz},RO)}if(kids(rp,"b").length)setC(rp,"bCs",{},RO);if(/[\u0600-\u06FF]/.test(txt))setC(rp,"rtl",{},RO)}
+function mk(t){const h=t.startsWith("# ");if(h)t=t.slice(2);const p=doc.createElementNS(W,"w:p"),pp=props(p,"pPr");
+setC(pp,"bidi",{},PO);setC(pp,"spacing",{line:Math.round($("ls").value*240),lineRule:"auto"},PO);setC(pp,"jc",{val:h?"center":"both"},PO);
+const r=doc.createElementNS(W,"w:r");p.appendChild(r);const rp=props(r,"rPr");fnt(rp,t,h);
+if(h){setC(rp,"b",{},RO);setC(rp,"bCs",{},RO);const z=Math.round(($("size").value*1+2)*2);setC(rp,"sz",{val:z},RO);setC(rp,"szCs",{val:z},RO)}
+const x=doc.createElementNS(W,"w:t");x.setAttributeNS(XS,"xml:space","preserve");x.textContent=t;r.appendChild(x);return p}
+const ser=()=>{const s=new XMLSerializer().serializeToString(doc);return s.startsWith("<?xml")?s:'<?xml version="1.0" encoding="UTF-8" standalone="yes"?>\n'+s};
+
+/* ---------- document view / file ---------- */
+function refresh(){paras=[...doc.getElementsByTagNameNS(W,"p")];const pv=$("pv");pv.textContent="";
+paras.slice(0,shown).forEach((p,i)=>{const d=document.createElement("div");d.className="pp"+(changed.has(p)?" ch":"");const n=document.createElement("b"),s=document.createElement("span");n.textContent=i+"  ";s.textContent=ptext(p)||"(فقرة فارغة)";d.append(n,s);pv.appendChild(d)});
+$("more").hidden=paras.length<=shown;pv.style.fontFamily='"'+$("font").value+'",serif';$("dl").disabled=false;$("wa").disabled=false}
+$("more").onclick=()=>{shown+=200;refresh()};
+$("file").onchange=async e=>{const f=e.target.files[0];e.target.value="";if(!f)return;const buf=await f.arrayBuffer(),u=new Uint8Array(buf);
+if(u[0]==0xD0&&u[1]==0xCF)return st("هذا ملف Word قديم (‎.doc‎). افتحه في Word واحفظه باسم بصيغة ‎.docx‎ ثم ارفعه.",1);
+try{await loadZip();zip=await JSZip.loadAsync(buf);doc=new DOMParser().parseFromString(await zip.file("word/document.xml").async("string"),"application/xml");
+if(doc.getElementsByTagName("parsererror").length)throw 0;fname=f.name;changed.clear();pending=[];shown=120;hist=[];$("undo").disabled=true;refresh();rp();st("تم فتح «"+f.name+"» وفيه "+paras.length+" فقرة.")}
+catch(x){st("تعذّر فتح الملف. تأكد أنه ‎.docx‎ سليم وغير محمي بكلمة مرور.",1)}};
+async function mkNew(){await loadZip();zip=new JSZip();const H='<?xml version="1.0" encoding="UTF-8" standalone="yes"?>';
+zip.file("[Content_Types].xml",H+'<Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"><Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/><Default Extension="xml" ContentType="application/xml"/><Override PartName="/word/document.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.document.main+xml"/></Types>');
+zip.file("_rels/.rels",H+'<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="word/document.xml"/></Relationships>');
+doc=new DOMParser().parseFromString('<w:document xmlns:w="'+W+'"><w:body><w:sectPr><w:pgSz w:w="11906" w:h="16838"/><w:pgMar w:top="1440" w:right="1440" w:bottom="1440" w:left="1440" w:header="708" w:footer="708" w:gutter="0"/><w:bidi/></w:sectPr></w:body></w:document>',"application/xml");
+fname="مستند جديد.docx";changed.clear();pending=[]}
+$("dl").onclick=async()=>{try{zip.file("word/document.xml",ser());const blob=await zip.generateAsync({type:"blob",mimeType:"application/vnd.openxmlformats-officedocument.wordprocessingml.document"});
+const name=fname.replace(/\.docx$/i,"")+"_معدل.docx";
+if(dir){const w=await(await dir.getFileHandle(name,{create:true})).createWritable();await w.write(blob);await w.close();return st("حُفظ الملف «"+name+"» في المجلد المختار.")}
+const a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(a.href),5000);st("تم تنزيل «"+name+"».")}catch(e){st("تعذّر حفظ الملف.",1)}};
+$("dir").onclick=async()=>{if(!window.showDirectoryPicker)return st("متصفحك لا يدعم اختيار مجلد (مثل Chrome على أندرويد). سيُنزَّل الملف في مجلد التنزيلات.",1);
+try{dir=await showDirectoryPicker({mode:"readwrite"});st("سيُحفظ كل مستند في المجلد «"+dir.name+"».")}catch(e){}};
+
+$("wa").onclick=async()=>{try{zip.file("word/document.xml",ser());const blob=await zip.generateAsync({type:"blob",mimeType:"application/vnd.openxmlformats-officedocument.wordprocessingml.document"});
+const name=fname.replace(/\.docx$/i,"")+"_معدل.docx",f=new File([blob],name,{type:blob.type});
+if(navigator.canShare&&navigator.canShare({files:[f]})){await navigator.share({files:[f],title:name});return st("اختر واتساب من قائمة المشاركة.")}
+$("dl").click();window.open("https://wa.me/?text="+encodeURIComponent("مرفق المستند: "+name),"_blank");st("نُزِّل الملف. أرفقه يدوياً في محادثة واتساب، فمتصفحك لا يدعم إرسال الملف مباشرة.")}
+catch(e){if(e.name!="AbortError")st("تعذّرت المشاركة.",1)}};
+
+const snap=()=>{hist.push(ser());if(hist.length>10)hist.shift();$("undo").disabled=false};
+$("undo").onclick=()=>{const s=hist.pop();if(!s)return;doc=new DOMParser().parseFromString(s,"application/xml");changed.clear();pending=[];rp();refresh();$("undo").disabled=!hist.length;st("تم التراجع عن آخر تعديل.")};
+
+/* ---------- formatting ---------- */
+["Traditional Arabic","Simplified Arabic","Sakkal Majalla","Arabic Typesetting","Arial","Tahoma","Times New Roman","Calibri","Cambria","Amiri"].forEach(f=>{const o=document.createElement("option");o.textContent=f;$("font").appendChild(o)});
+$("font").onchange=()=>doc&&refresh();
+$("fmtb").onclick=()=>{if(!doc)return st("افتح مستنداً أولاً.",1);snap();const ln=Math.round($("ls").value*240);
+paras.forEach(p=>{const pp=props(p,"pPr");setC(pp,"bidi",{},PO);const sp=getC(pp,"spacing",PO);sp.setAttributeNS(W,"w:line",ln);sp.setAttributeNS(W,"w:lineRule","auto");if($("just").checked)setC(pp,"jc",{val:"both"},PO);
+const hd=/Head|Title|عنوان/i.test(kids(pp,"pStyle")[0]?.getAttributeNS(W,"val")||"");
+[...p.getElementsByTagNameNS(W,"r")].forEach(r=>fnt(props(r,"rPr"),rtext(r),hd))});refresh();st("تم تطبيق التنسيق على كامل المستند.")};
+
+/* ---------- AI ---------- */
+async function ai(prompt){const k=ls.getItem("k");if(!k)throw new Error("أدخل مفتاح API من تبويب الإعدادات أولاً.");
+const r=await fetch("https://api.anthropic.com/v1/messages",{method:"POST",headers:{"content-type":"application/json","x-api-key":k,"anthropic-version":"2023-06-01","anthropic-dangerous-direct-browser-access":"true"},body:JSON.stringify({model:ls.getItem("m")||"claude-sonnet-4-6",max_tokens:4000,messages:[{role:"user",content:prompt}]})});
+const j=await r.json();if(!r.ok)throw new Error(j.error?.message||"خطأ "+r.status);const t=j.content.map(c=>c.text||"").join(""),a=t.indexOf("{"),b=t.lastIndexOf("}");
+try{return JSON.parse(t.slice(a,b+1))}catch(e){throw new Error("جاء الرد غير مكتمل. اطلب تعديلاً أصغر.")}}
+const P_CHAT=(list,ctx,q)=>`أنت مساعد تحرير وصياغة لمكتب محاماة مصري. أمامك فقرات مستند Word مرقّمة، ونصوص من مكتبة المكتب، وطلب المحامي.
+
+فقرات المستند:
+${list}
+
+نصوص المكتبة (المصدر الوحيد المسموح بالاقتباس الحرفي منه):
+${ctx}
+
+طلب المحامي:
+${q}
+
+القواعد:
+1) نفّذ الطلب بدقة: إدراج فقرات أو نصوص مواد أو أسانيد بعد فقرة معيّنة، أو تعديل فقرة، أو مناقشة المذكرة وتصحيحها.
+2) لا تقتبس نص مادة أو رقمها أو حكماً قضائياً إلا من نصوص المكتبة أعلاه، وانسخه حرفياً مع ذكر اسم المصدر. إن لم تجد المطلوب فيها فاذكر ذلك في reply ولا تُدرج ولا تخمّن.
+3) لا تغيّر أي فقرة لم يطلبها المحامي.
+4) اكتب بعربية قانونية فصيحة وإملاء سليم.
+5) إن كان الطلب نقاشاً أو سؤالاً فأجب في reply فقط واترك ops فارغة.
+أعد JSON فقط بلا أي نص آخر: {"reply":"ردك للمحامي بإيجاز","ops":[{"type":"insert_after","i":رقم_الفقرة,"text":"النص"},{"type":"replace","i":رقم_الفقرة,"text":"النص الجديد"}]}`;
+const P_SPELL=`صحّح الأخطاء الإملائية والنحوية وعلامات الترقيم في المقاطع التالية وفق قواعد الكتابة العربية السليمة (الهمزات، التاء المربوطة والهاء، الألف المقصورة، الضاد والظاء، التنوين، المسافات، الفواصل). لا تغيّر المعنى ولا الأرقام ولا أسماء الأشخاص والجهات ولا نصوص المواد المقتبسة إلا لتصحيح خطأ إملائي واضح، وأبقِ المسافات في أول المقطع وآخره كما هي. أعد JSON فقط: {"fixes":[{"i":رقم_المقطع,"text":"المقطع بعد التصحيح"}]} للمقاطع التي تغيّرت فقط.
+`;
+const say=(c,t,bad)=>{const d=document.createElement("div");d.className="m "+c+(bad?" bad":"");d.textContent=t;$("log").appendChild(d);$("log").scrollTop=1e6};
+const busy=b=>["send","spell"].forEach(i=>$(i).disabled=b);
+async function ask(){const q=$("q").value.trim();if(!q)return;if(!doc)return say("a","افتح مستنداً أولاً أو أنشئ واحداً من تبويب القوالب.");
+say("u",q);$("q").value="";busy(1);
+try{let ctx="(المكتبة غير مفعّلة: لا تقتبس أي نص قانوني)";if($("useLib").checked){await loadLib();const h=find(q);ctx=h.length?h.map((c,i)=>"[م"+(i+1)+"] "+c.title+" ("+c.kind+"):\n"+c.text).join("\n\n"):"(لا نتائج في المكتبة لهذا الطلب)"}
+const list=paras.map((p,i)=>i+": "+ptext(p).slice(0,300)).join("\n").slice(0,14000);const r=await ai(P_CHAT(list,ctx,q));say("a",r.reply||"تم.");
+pending=(r.ops||[]).filter(o=>paras[o.i]&&o.text).map(o=>({type:o.type=="replace"?"replace":"insert_after",i:o.i,text:o.text,on:true}));rp()}
+catch(e){say("a",e.message,1)}busy(0)}
+$("send").onclick=ask;$("q").onkeydown=e=>{if(e.key=="Enter"&&(e.ctrlKey||e.metaKey))ask()};
+$("spell").onclick=async()=>{if(!doc)return say("a","افتح مستنداً أولاً.",1);busy(1);pending=[];
+try{const us=runs().map((r,k)=>({r,k,t:rtext(r)})).filter(u=>u.t.trim().length>1);
+for(let s=0;s<us.length;s+=25){const ch=us.slice(s,s+25);st("التدقيق: "+Math.min(s+25,us.length)+" من "+us.length);const o=await ai(P_SPELL+ch.map(u=>u.k+": "+u.t).join("\n"));
+(o.fixes||[]).forEach(f=>{const u=ch.find(x=>x.k===f.i);if(u&&f.text&&f.text!==u.t)pending.push({type:"fix",run:u.r,old:u.t,text:f.text,on:true})})}
+say("a",pending.length?"وجدتُ "+pending.length+" تصحيحاً. اختر ما تريد اعتماده.":"لم أجد أخطاء تحتاج تصحيحاً.");st("انتهى التدقيق.");rp()}
+catch(e){say("a",e.message,1)}busy(0)};
+function rp(){const b=$("pend");b.textContent="";if(!pending.length)return;
+pending.forEach(o=>{const d=document.createElement("div");d.className="it";const c=document.createElement("input");c.type="checkbox";c.checked=o.on;c.style.width="auto";c.onchange=()=>o.on=c.checked;
+const t=document.createElement("div");t.className="t";t.textContent=o.type=="fix"?"تصحيح إملائي":o.type=="replace"?"استبدال الفقرة "+o.i:"إدراج بعد الفقرة "+o.i;
+const x=document.createElement("div");if(o.old){const del=document.createElement("del");del.textContent=o.old;x.append(del,document.createElement("br"))}x.append(o.text);d.append(c," ",t,x);b.appendChild(d)});
+const a=document.createElement("button");a.className="p";a.textContent="تطبيق المحدد";a.onclick=applyP;const n=document.createElement("button");n.textContent="تجاهل الكل";n.onclick=()=>{pending=[];rp()};b.append(a," ",n)}
+function applyP(){const sel=pending.filter(x=>x.on),last=new Map();if(sel.length)snap();
+sel.forEach(o=>{if(o.type=="fix"){setRun(o.run,o.text);changed.add(o.run.parentNode);return}const t=paras[o.i];if(o.type=="replace"){setText(t,o.text);changed.add(t);return}
+const nx=paras[o.i+1],ref=ptext(t).length<25&&nx?nx:t;let a=last.get(t)||t;o.text.split(/\n+/).filter(s=>s.trim()).forEach(s=>{const n=newPara(ref,s);a.after(n);a=n;changed.add(n)});last.set(t,a)});
+pending=[];rp();refresh();st("تم تطبيق "+sel.length+" تعديل. راجع المستند ثم احفظه.")}
+
+/* ---------- templates ---------- */
+const BUILT=[{n:"ترويسة مكتب محاماة",k:"ترويسة",b:"# مكتب [اسم المكتب] للمحاماة والاستشارات القانونية\n[اسم المحامي] — المحامي بالنقض\n[العنوان] — هاتف: [رقم الهاتف]"},
+{n:"مذكرة بدفاع",k:"مذكرة",b:"# مذكرة بدفاع\nمقدمة من: [الاسم]\nضد: [الاسم]\nفي الدعوى رقم [   ] لسنة [   ] أمام محكمة [   ]\n# أولاً: الوقائع\n[اكتب الوقائع هنا]\n# ثانياً: الدفاع\n[اكتب أوجه الدفاع هنا]\n# ثالثاً: الطلبات\nلذلك يلتمس الحاضر عن [الصفة] [الطلبات]\nوكيل [الصفة]\n[اسم المحامي]"},
+{n:"مذكرة شارحة",k:"مذكرة",b:"# مذكرة شارحة\nفي الدعوى رقم [   ] لسنة [   ]\n# موضوع المذكرة\n[اكتب الموضوع هنا]\n# الأسانيد القانونية\n[اكتب الأسانيد هنا]\n# الخاتمة\n[اكتب الخاتمة هنا]"}];
+function rt(){const b=$("tpls");b.textContent="";const mine=jget("tpl");BUILT.concat(mine).forEach((t,i)=>{const d=document.createElement("div");d.className="it";const n=document.createElement("b");n.textContent=t.n+" ";const k=document.createElement("span");k.className="t";k.textContent=t.k;
+const u=document.createElement("button");u.textContent="إدراج";u.onclick=()=>useTpl(t);d.append(n,k,document.createElement("br"),u);
+if(i>=BUILT.length){const x=document.createElement("button");x.textContent="حذف";x.onclick=()=>{mine.splice(i-BUILT.length,1);ls.tpl=JSON.stringify(mine);rt()};d.append(" ",x)}b.appendChild(d)})}
+async function useTpl(t){if(!doc){await mkNew()}else snap();const body=doc.getElementsByTagNameNS(W,"body")[0],ref=$("pos").value=="start"?body.firstChild:(kids(body,"sectPr")[0]||null);
+t.b.split("\n").filter(s=>s.trim()).map(mk).forEach(n=>{body.insertBefore(n,ref);changed.add(n)});refresh();st("تم إدراج القالب «"+t.n+"».")}
+$("tsave").onclick=()=>{const n=$("tname").value.trim();if(!doc||!n)return st("افتح مستنداً واكتب اسماً للقالب.",1);const a=jget("tpl");a.push({n,k:"مذكرة",b:paras.map(ptext).filter(s=>s.trim()).join("\n")});
+try{ls.tpl=JSON.stringify(a);$("tname").value="";rt();st("حُفظ القالب «"+n+"».")}catch(e){st("مساحة التخزين في المتصفح ممتلئة.",1)}};
+
+/* ---------- legal library ---------- */
+const norm=s=>s.replace(/[\u064B-\u0652\u0640]/g,"").replace(/[أإآ]/g,"ا").replace(/ى/g,"ي").replace(/ة/g,"ه").toLowerCase();
+const toks=s=>norm(s).split(/[^\u0621-\u064Aa-z0-9]+/).filter(w=>w.length>1).map(w=>w.replace(/^ال(?=.{2})/,""));
+function addLib(title,kind,text,src){let buf="";const push=()=>{if(buf.trim())lib.push({title,kind,src,text:buf.trim(),set:new Set(toks(buf))});buf=""};text.split(/\n+/).forEach(l=>{if((buf+l).length>600)push();buf+=l+"\n"});push()}
+async function loadLib(){if(lib)return;lib=[];let items=[];try{const r=await fetch("library/index.json",{cache:"no-cache"});if(r.ok)items=(await r.json()).items||[]}catch(e){}
+for(const it of items){try{const r=await fetch("library/"+it.file);if(r.ok)addLib(it.title,it.kind,await r.text(),"المستودع")}catch(e){}}
+jget("ll").forEach(it=>addLib(it.title,it.kind,it.text,"جهازي"))}
+const find=(q,n=6)=>{const t=toks(q);return lib.map(c=>({c,s:t.filter(w=>c.set.has(w)).length})).filter(x=>x.s>0).sort((a,b)=>b.s-a.s).slice(0,n).map(x=>x.c)};
+$("ls1").oninput=async e=>{await loadLib();const b=$("res");b.textContent="";const q=e.target.value.trim();if(!q)return;const h=find(q);
+if(!h.length){b.textContent=lib.length?"لا نتائج.":"المكتبة فارغة. أضف نصاً أو ضع ملفات في مجلد library.";return}
+h.forEach(c=>{const d=document.createElement("div");d.className="it";const t=document.createElement("div");t.className="t";t.textContent=c.title+" — "+c.kind+" ("+c.src+")";d.append(t,c.text);b.appendChild(d)})};
+function rl(){const b=$("loc");b.textContent="";jget("ll").forEach((it,i)=>{const d=document.createElement("div");d.className="it";d.append(it.title+" ");const x=document.createElement("button");x.textContent="حذف";x.onclick=()=>{const a=jget("ll");a.splice(i,1);ls.ll=JSON.stringify(a);lib=null;rl()};
+const g=document.createElement("button");g.textContent="تنزيل ‎.txt‎";g.onclick=()=>{const a=document.createElement("a");a.href=URL.createObjectURL(new Blob([it.text],{type:"text/plain;charset=utf-8"}));a.download=it.title+".txt";a.click()};d.append(x," ",g);b.appendChild(d)})}
+async function docxText(f){await loadZip();const z=await JSZip.loadAsync(await f.arrayBuffer()),d=new DOMParser().parseFromString(await z.file("word/document.xml").async("string"),"application/xml");
+return[...d.getElementsByTagNameNS(W,"p")].map(p=>[...p.getElementsByTagNameNS(W,"t")].map(t=>t.textContent).join("")).join("\n")}
+$("ladd").onclick=async()=>{try{const t=$("lt").value.trim(),f=$("lf").files[0];let x=$("lx").value.trim();if(f)x=/\.docx$/i.test(f.name)?await docxText(f):await f.text();
+if(!t||!x)return st("اكتب العنوان وألصق النص أو اختر ملفاً.",1);const a=jget("ll");a.push({title:t,kind:$("lk").value,text:x});ls.ll=JSON.stringify(a);lib=null;$("lt").value=$("lx").value="";$("lf").value="";rl();st("أُضيف «"+t+"» إلى المكتبة.")}
+catch(e){st("تعذّرت الإضافة. قد تكون مساحة التخزين ممتلئة؛ ضع الملف في مجلد library بالمستودع.",1)}};
+
+/* ---------- settings / tabs ---------- */
+$("key").value=ls.getItem("k")||"";$("mdl").value=ls.getItem("m")||"";
+$("sset").onclick=()=>{ls.setItem("k",$("key").value.trim());ls.setItem("m",$("mdl").value.trim());st("تم حفظ الإعدادات.")};
+$("cset").onclick=()=>{ls.removeItem("k");$("key").value="";st("تم مسح المفتاح.")};
+document.querySelectorAll("[data-t]").forEach(b=>b.onclick=()=>{document.querySelectorAll(".tab").forEach(s=>s.hidden=s.id!="t-"+b.dataset.t);document.querySelectorAll("[data-t]").forEach(x=>x.setAttribute("aria-selected",x==b))});
+document.querySelectorAll("[data-q]").forEach(b=>b.onclick=()=>{$("q").value=b.dataset.q;$("q").focus()});
+rt();rl();
+</script>
+</body>
+</html>
